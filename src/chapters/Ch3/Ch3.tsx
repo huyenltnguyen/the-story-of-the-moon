@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { OptimizedImage } from '@/components/OptimizedImage/OptimizedImage';
 import { Prose } from '@/components/Prose';
 import {
   ScrollyChapter,
@@ -259,7 +260,7 @@ function Ch3Visual({
   if (!webglAvailable) {
     return (
       <div ref={targetRef} className={styles.visualSlot}>
-        <img
+        <OptimizedImage
           className={styles.fallbackDiagram}
           src="/ch3/with-moon.svg"
           alt="Schematic showing the Sun, Earth, and Moon in alignment"

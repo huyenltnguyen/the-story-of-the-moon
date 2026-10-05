@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { BP_DESKTOP } from '@/utils/breakpoints';
+import { publicAssetUrl } from '@/utils/publicAssetUrl';
 
 export type FeatureProjection = {
   /** Pixel x relative to the canvas's top-left corner (CSS px). */
@@ -250,39 +251,47 @@ export function createMoonScene(
     });
   };
 
-  loadTexture('/moon/moon-2k.avif', '/moon/moon-2k.jpg', (loadedTexture) => {
-    loadedTexture.colorSpace = THREE.SRGBColorSpace;
-    texture2k = loadedTexture;
-    material.map = loadedTexture;
-    material.needsUpdate = true;
-
-    // Reveal the now-textured Moon. Snap straight to visible under reduced
-    // motion; otherwise arm the fade driven by renderFrame. If the loop is
-    // paused when the texture lands, the elapsed time will already exceed
-    // MOON_REVEAL_MS by the time it resumes, so the fade snaps to full on the
-    // first frame rather than replaying when the reader scrolls it into view.
-    if (reducedMotion) {
-      material.opacity = 1;
-      material.transparent = false;
+  loadTexture(
+    publicAssetUrl('/moon/moon-2k.avif'),
+    publicAssetUrl('/moon/moon-2k.jpg'),
+    (loadedTexture) => {
+      loadedTexture.colorSpace = THREE.SRGBColorSpace;
+      texture2k = loadedTexture;
+      material.map = loadedTexture;
       material.needsUpdate = true;
-    } else {
-      moonRevealStart = performance.now();
-      moonRevealing = true;
-    }
 
-    if (
-      window.matchMedia(
-        `(min-width: ${BP_DESKTOP}px) and (min-resolution: 2dppx)`
-      ).matches
-    ) {
-      loadTexture('/moon/moon-8k.avif', '/moon/moon-8k.jpg', (hiResTexture) => {
-        hiResTexture.colorSpace = THREE.SRGBColorSpace;
-        texture8k = hiResTexture;
-        material.map = hiResTexture;
+      // Reveal the now-textured Moon. Snap straight to visible under reduced
+      // motion; otherwise arm the fade driven by renderFrame. If the loop is
+      // paused when the texture lands, the elapsed time will already exceed
+      // MOON_REVEAL_MS by the time it resumes, so the fade snaps to full on the
+      // first frame rather than replaying when the reader scrolls it into view.
+      if (reducedMotion) {
+        material.opacity = 1;
+        material.transparent = false;
         material.needsUpdate = true;
-      });
+      } else {
+        moonRevealStart = performance.now();
+        moonRevealing = true;
+      }
+
+      if (
+        window.matchMedia(
+          `(min-width: ${BP_DESKTOP}px) and (min-resolution: 2dppx)`
+        ).matches
+      ) {
+        loadTexture(
+          publicAssetUrl('/moon/moon-8k.avif'),
+          publicAssetUrl('/moon/moon-8k.jpg'),
+          (hiResTexture) => {
+            hiResTexture.colorSpace = THREE.SRGBColorSpace;
+            texture8k = hiResTexture;
+            material.map = hiResTexture;
+            material.needsUpdate = true;
+          }
+        );
+      }
     }
-  });
+  );
 
   const controls = new OrbitControls(camera, canvas);
   controls.enablePan = false;

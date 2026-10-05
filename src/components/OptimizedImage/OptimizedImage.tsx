@@ -1,4 +1,5 @@
 import type { ImgHTMLAttributes } from 'react';
+import { publicAssetSrcSet, publicAssetUrl } from '@/utils/publicAssetUrl';
 import styles from './OptimizedImage.module.css';
 
 type Props = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> & {
@@ -24,6 +25,11 @@ export function OptimizedImage({
   ...imgProps
 }: Props) {
   const resolvedDecoding = decoding ?? (loading === 'lazy' ? 'async' : 'auto');
+  const resolvedSrc = src ? publicAssetUrl(src) : undefined;
+  const resolvedSrcSet = srcSet ? publicAssetSrcSet(srcSet) : undefined;
+  const resolvedAvifSrcSet = avifSrcSet
+    ? publicAssetSrcSet(avifSrcSet)
+    : undefined;
   const pictureClassName = className
     ? `${styles.picture} ${className}`
     : styles.picture;
@@ -32,8 +38,8 @@ export function OptimizedImage({
     <img
       {...imgProps}
       className={styles.image}
-      src={src}
-      srcSet={srcSet}
+      src={resolvedSrc}
+      srcSet={resolvedSrcSet}
       sizes={sizes}
       alt={alt}
       loading={loading}
@@ -46,8 +52,8 @@ export function OptimizedImage({
       <img
         {...imgProps}
         className={className}
-        src={src}
-        srcSet={srcSet}
+        src={resolvedSrc}
+        srcSet={resolvedSrcSet}
         sizes={sizes}
         alt={alt}
         loading={loading}
@@ -59,7 +65,7 @@ export function OptimizedImage({
   return (
     <picture className={pictureClassName}>
       <source
-        srcSet={avifSrcSet ?? toAvifPath(src)}
+        srcSet={resolvedAvifSrcSet ?? toAvifPath(publicAssetUrl(src))}
         sizes={sizes}
         type="image/avif"
       />
